@@ -14,6 +14,14 @@ struct Box
 {
     sf::RectangleShape shape;
 
+    bool wasHit {false};
+
+    void makeHit()
+    {
+        wasHit = true;
+    }
+
+
     Box(float bX, float bY)
     {
         shape.setPosition({bX,bY});
@@ -23,6 +31,7 @@ struct Box
         shape.setOutlineThickness(5.0f);
         shape.setOutlineColor(sf::Color::Black);
     }
+    // borderBox {shape.getGlobalBounds()};
 };
 
 
@@ -30,11 +39,6 @@ struct Box
 
 //Box box1{wHeight/2,wWidth/2};
 //Box box2{300,420};
-
-
-
-
-
 
 
 int main()
@@ -57,6 +61,12 @@ int main()
         gapY += 60;
         }
 
+
+    //boxes[0].makeHit();
+    boxes[84].makeHit();
+    boxes[168].makeHit();
+
+
     while (window.isOpen())
     {
 
@@ -76,13 +86,37 @@ int main()
 
         }
 
+
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+        //float xClickPos  = sf::Mouse::getPosition(window).x;
+        //float yClickPos = sf::Mouse::getPosition(window).y;
+
+        auto mousePos = sf::Mouse::getPosition(window);
+        auto transMousePos = window.mapPixelToCoords(mousePos);
+//        std::cout<<  xClickPos << "," << yClickPos << '\n';
+        for(unsigned int i {0};i<boxes.size();++i)
+            {
+                //if(boxes[i].borderBox.contains({xClickPos,yClickPos})){
+                if(boxes[i].shape.getGlobalBounds().contains(transMousePos))
+                {
+
+                    boxes[i].makeHit();
+                    }
+
+            }
+
+    }
+
     //RENDER
     window.clear(sf::Color::White);
 
     //KRESLENIE
 
-    for(int i {0};i<boxes.size();++i)
+    for(unsigned int i {0};i<boxes.size();++i)
+
+        if(!(boxes[i].wasHit))
         {
+
             window.draw(boxes[i].shape);
         }
 
@@ -90,3 +124,5 @@ int main()
 
 }
 }
+
+
