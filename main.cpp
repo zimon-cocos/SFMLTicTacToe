@@ -8,7 +8,8 @@ constexpr float boxWidth {49.0f};
 constexpr float boxHeight {49.0f};
 constexpr int boxAmountX {13};
 constexpr int boxAmountY {13};
-constexpr float outlineThickness{5.0f};
+constexpr float outlineThickness{6.0f};
+constexpr float tempCircleRadius{15.0f};
 
 
 
@@ -20,10 +21,10 @@ struct Sprites
 
     Sprites(float sX, float sY)
     {
-        shape.setOrigin(shape.getGeometricCenter());
+        //shape.setOrigin(shape.getGeometricCenter());
         shape.setPosition({sX,sY});
         shape.setFillColor(sf::Color::Red);
-        shape.setRadius(10.0f);
+        shape.setRadius(tempCircleRadius);
     }
 };
 
@@ -49,14 +50,12 @@ struct Box
         shape.setPosition({bX,bY});
         shape.setFillColor(sf::Color::Transparent);
         shape.setSize({boxWidth,boxHeight});
-        //shape.setOrigin(shape.getGeometricCenter());
         shape.setOutlineThickness(outlineThickness);
         shape.setOutlineColor(sf::Color::Black);
-        centerPosX = (bX + (boxWidth/2) - (outlineThickness*2));
-        centerPosY = (bY + (boxHeight/2) - (outlineThickness*2));
+        centerPosX = (bX + (boxWidth/2) - (outlineThickness*(tempCircleRadius/outlineThickness)));
+        centerPosY = (bY + (boxHeight/2) - (outlineThickness*(tempCircleRadius/outlineThickness)));
     }
 
-    // borderBox {shape.getGlobalBounds()};
 };
 
 
