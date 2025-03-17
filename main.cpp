@@ -82,9 +82,14 @@ int main()
 
     std::vector<Sprites> sprites;
 
+    unsigned long framesPassed {0};
+    long framesPassedNow {0};
+    long framesPassedSince {0};
+    sf::Clock clock;
     while (window.isOpen())
     {
 
+        sf::Time timeElapsed = clock.getElapsedTime();
         while(const std::optional event = window.pollEvent()){
 
         if(event->is<sf::Event::Closed>()){
@@ -101,27 +106,32 @@ int main()
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
     {
-        auto mousePos = sf::Mouse::getPosition(window);
-        auto transMousePos = window.mapPixelToCoords(mousePos);
-        for(unsigned int i {0};i<boxes.size();++i)
-            {
-                if(boxes[i].shape.getGlobalBounds().contains(transMousePos))
+        if(timeElapsed.asSeconds() > 0.2)
+        {
+            clock.restart();
+            auto mousePos = sf::Mouse::getPosition(window);
+            auto transMousePos = window.mapPixelToCoords(mousePos);
+            for(unsigned int i {0};i<boxes.size();++i)
                 {
-                    if(isNotCross)
+                    if(boxes[i].shape.getGlobalBounds().contains(transMousePos))
                     {
-                        sprites.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY,sf::Color::Red);
-                        isNotCross = false;
-                        std::cout << boxes[i].centerPosX << "," << boxes[i].centerPosY << '\n';
-                        boxes[i].makeHit();
-                    }
-                    else{
-                        sprites.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY,sf::Color::Blue);
-                        isNotCross = true;
-                    }
+                        if(isNotCross)
+                        {
+                            sprites.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY,sf::Color::Red);
+                            isNotCross = false;
+                            std::cout << boxes[i].centerPosX << "," << boxes[i].centerPosY << '\n';
+                            //boxes[i].makeHit();
+                        }
+                        else{
+                            sprites.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY,sf::Color::Blue);
+                            isNotCross = true;
+                        }
 
-                    }
+                        }
 
-            }
+                }
+        }
+
 
     }
 
