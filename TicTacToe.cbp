@@ -51,8 +51,8 @@
 		</Linker>
 		<Unit filename="fonts/PLANK___.TTF" />
 		<Unit filename="main.cpp" />
-		<Unit filename="sprites/apple.png" />
-		<Unit filename="sprites/flare_armor.png" />
+		<Unit filename="sprites/kriz50.png" />
+		<Unit filename="sprites/kruh50.png" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

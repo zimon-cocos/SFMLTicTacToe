@@ -1,8 +1,9 @@
 # depslib dependency file v1.0
-1742229299 source:/home/heslo-odin/Documents/c++/SFMLTicTacToe/main.cpp
+1742394839 source:/home/heslo-odin/Documents/c++/SFMLTicTacToe/main.cpp
 	<iostream>
 	<SFML/Graphics.hpp>
 	<vector>
+	<cmath>
 
 1735558136 /home/heslo-odin/Documents/SFML_Attempt_2/SFML-3.0.0/include/SFML/Graphics.hpp
 	<SFML/Graphics/BlendMode.hpp>
