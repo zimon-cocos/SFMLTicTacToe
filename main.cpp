@@ -5,29 +5,28 @@
 
 constexpr unsigned int wWidth {800};
 constexpr unsigned int wHeight {800};
-constexpr float boxWidth {50.0f};
-constexpr float boxHeight {50.0f};
+constexpr float boxWidth {60.0f};
 constexpr float boxDiagonal {boxWidth * sqrt(2)};
-constexpr int boxAmountX {13};
-constexpr int boxAmountY {13};
+constexpr int boxAmountX {3};
+constexpr int boxAmountY {3};
 constexpr float outlineThickness{4.0f};
-constexpr float tempCircleRadius{15.0f};
+constexpr float tempCircleRadius{boxWidth/3};
 bool isNotCross {true};
+constexpr float objectsSize {boxWidth/10};
 
-//placeholder na sprite
 struct Circle
 {
     sf::CircleShape shape;
 
-
     Circle(float sX, float sY,sf::Color color)
     {
-        //shape.setOrigin(shape.getGeometricCenter());
+
         shape.setPosition({sX,sY});
         shape.setFillColor(sf::Color::Transparent);
         shape.setOutlineColor(color);
-        shape.setOutlineThickness(8.0f);
+        shape.setOutlineThickness(objectsSize);
         shape.setRadius(tempCircleRadius);
+        shape.setOrigin(shape.getGeometricCenter());
     }
 };
 
@@ -39,16 +38,16 @@ struct Cross
     Cross(float sX, float sY)
     {
 
-        line1.setSize({boxDiagonal,8.0f});
+        line1.setSize({boxDiagonal-objectsSize,objectsSize});
         line1.setOrigin(line1.getGeometricCenter());
-        line1.setPosition({sX+(boxWidth/4)+(boxWidth/22),sY+(boxHeight/4)+(boxHeight/22)});
+        line1.setPosition({sX,sY});
         line1.setFillColor(sf::Color::Red);
         line1.rotate(sf::degrees(45));
 
 
-        line2.setSize({boxDiagonal,8.0f});
+        line2.setSize({boxDiagonal-objectsSize,objectsSize});
         line2.setOrigin(line2.getGeometricCenter());
-        line2.setPosition({sX+(boxWidth/4)+(boxWidth/22),sY+(boxHeight/4)+(boxHeight/22)});
+        line2.setPosition({sX,sY});
         line2.setFillColor(sf::Color::Red);
         line2.rotate(sf::degrees(135));
     }
@@ -66,23 +65,24 @@ struct Box
 
     float centerPosX {0};
     float centerPosY {0};
+
     bool wasClicked {false};
+    bool isCrossed {false};
+    bool isCircled {false};
+
+
     Box(float bX, float bY)
     {
         shape.setPosition({bX,bY});
         shape.setFillColor(sf::Color::Transparent);
-        shape.setSize({boxWidth,boxHeight});
+        shape.setSize({boxWidth,boxWidth});
         shape.setOutlineThickness(outlineThickness);
         shape.setOutlineColor(sf::Color::Black);
-        centerPosX = (bX + (boxWidth/2) - (outlineThickness*(tempCircleRadius/outlineThickness)));
-        centerPosY = (bY + (boxHeight/2) - (outlineThickness*(tempCircleRadius/outlineThickness)));
+        centerPosX = (bX + (boxWidth/2));
+        centerPosY = (bY + (boxWidth/2));
     }
 
 };
-
-
-
-
 
 int main()
 {
@@ -91,24 +91,23 @@ int main()
     window.setFramerateLimit(60);
 
     std::vector<Box> boxes;
+
     int gapX {0};
     int gapY {0};
     for(int i {0}; i<boxAmountY; ++i)
         {
         for(int i {0};i<boxAmountX; ++i)
             {
-                boxes.emplace_back(outlineThickness*2+gapX,outlineThickness*2+gapY);
-                gapX += 60;
+                boxes.emplace_back(outlineThickness*2+gapX+100,outlineThickness*2+gapY+100);
+                gapX += boxWidth+outlineThickness*2;
             }
 
         gapX  = 0;
-        gapY += 60;
+        gapY += boxWidth+outlineThickness*2;
         }
 
     std::vector<Circle> circles;
     std::vector<Cross> crosses;
-
-
 
     sf::Clock clock;
     while (window.isOpen())
@@ -138,34 +137,27 @@ int main()
             auto transMousePos = window.mapPixelToCoords(mousePos);
             for(unsigned int i {0};i<boxes.size();++i)
                 {
-                    if(boxes[i].shape.getGlobalBounds().contains(transMousePos))
-                    {
-                        boxes[i].wasClicked = true;
-                        if(isNotCross)
+                    if(boxes[i].shape.getGlobalBounds().contains(transMousePos) && !(boxes[i].wasClicked))
                         {
-                            crosses.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY);
-                            isNotCross = false;
-
-                            std::cout << boxes[i].centerPosX << "," << boxes[i].centerPosY << '\n';
+                            boxes[i].wasClicked = true;
+                            if(isNotCross)
+                            {
+                                crosses.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY);
+                                isNotCross = false;
+                                boxes[i].isCrossed = true;
+                            }
+                            else{
+                                circles.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY,sf::Color::Blue);
+                                isNotCross = true;
+                                boxes[i].isCircled = true;
+                            }
                         }
-                        else{
-                            circles.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY,sf::Color::Blue);
-                            isNotCross = true;
-                            std::cout << boxes[i].centerPosX << "," << boxes[i].centerPosY << '\n';
-                        }
-
-                        }
-
                 }
         }
-
-
     }
-
 
     //RENDER
     window.clear(sf::Color::White);
-
     //KRESLENIE
 
     for(unsigned int i {0};i<boxes.size();++i)
@@ -173,9 +165,6 @@ int main()
 
             window.draw(boxes[i].shape);
         }
-
-
-
 
     for(unsigned int i {0};i<circles.size();++i)
         {
@@ -187,10 +176,6 @@ int main()
             window.draw(crosses[i].line1);
             window.draw(crosses[i].line2);
         }
-
-
-
-
     window.display();
 
 }
