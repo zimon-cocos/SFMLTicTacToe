@@ -7,12 +7,14 @@ constexpr unsigned int wWidth {800};
 constexpr unsigned int wHeight {800};
 constexpr float boxWidth {60.0f};
 constexpr float boxDiagonal {boxWidth * sqrt(2)};
-constexpr int boxAmountX {3};
-constexpr int boxAmountY {3};
+constexpr int boxAmountX {6};
+constexpr int boxAmountY {6};
 constexpr float outlineThickness{4.0f};
 constexpr float tempCircleRadius{boxWidth/3};
 bool isNotCross {true};
 constexpr float objectsSize {boxWidth/10};
+
+
 
 struct Circle
 {
@@ -70,6 +72,8 @@ struct Box
     bool isCrossed {false};
     bool isCircled {false};
 
+    int gridXValue {0};
+    int gridYValue {0};
 
     Box(float bX, float bY)
     {
@@ -84,26 +88,82 @@ struct Box
 
 };
 
+
+void checkForWin(unsigned int index2Check, std::vector<Box>& vct2Check)
+{
+    std::cout<< "[" << vct2Check[index2Check].gridXValue << "," << vct2Check[index2Check].gridYValue << "] is crossed: " << vct2Check[index2Check].isCrossed << ",is circled:" << vct2Check[index2Check].isCircled << '\n';
+    //Check x axis, win type of middle placement
+    if((vct2Check[index2Check-1].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2Check+1].gridYValue == vct2Check[index2Check].gridYValue))
+       {
+           if(vct2Check[index2Check-1].isCrossed && vct2Check[index2Check].isCrossed && vct2Check[index2Check+1].isCrossed)
+            {
+             std::cout << "Cross wins.\n";
+            }
+       }
+
+    //Check y axis, win type of middle placement
+    if((vct2Check[index2Check-boxAmountY].gridXValue == vct2Check[index2Check].gridXValue) && (vct2Check[index2Check+boxAmountY].gridXValue == vct2Check[index2Check].gridXValue))
+       {
+           if(vct2Check[index2Check-boxAmountY].isCrossed && vct2Check[index2Check].isCrossed && vct2Check[index2Check+boxAmountY].isCrossed)
+            {
+             std::cout << "Cross wins.\n";
+            }
+       }
+
+
+}
+
+
+
+
 int main()
 {
 
     sf::RenderWindow window (sf::VideoMode({wWidth,wHeight}),"TicTacToe");
     window.setFramerateLimit(60);
 
+    sf::Font font("Roboto-Italic-VariableFont_wdth,wght.ttf");
+
+
+
+
     std::vector<Box> boxes;
 
-    int gapX {0};
-    int gapY {0};
+    float gapX {0};
+    float gapY {0};
     for(int i {0}; i<boxAmountY; ++i)
         {
         for(int i {0};i<boxAmountX; ++i)
             {
                 boxes.emplace_back(outlineThickness*2+gapX+100,outlineThickness*2+gapY+100);
                 gapX += boxWidth+outlineThickness*2;
+
             }
 
         gapX  = 0;
         gapY += boxWidth+outlineThickness*2;
+        }
+
+    int boxesX {0};
+    int boxesY {0};
+
+    for(int i {0}; i<boxes.size(); ++i)
+        {
+            if(boxesX < boxAmountX)
+            {
+                boxes[i].gridXValue = boxesX;
+                boxes[i].gridYValue = boxesY;
+                ++boxesX;
+            }
+            else
+            {
+                boxesX = 0;
+                ++boxesY;
+                boxes[i].gridXValue = boxesX;
+                boxes[i].gridYValue = boxesY;
+                ++boxesX;
+            }
+
         }
 
     std::vector<Circle> circles;
@@ -137,9 +197,10 @@ int main()
             auto transMousePos = window.mapPixelToCoords(mousePos);
             for(unsigned int i {0};i<boxes.size();++i)
                 {
-                    if(boxes[i].shape.getGlobalBounds().contains(transMousePos) && !(boxes[i].wasClicked))
+                    if(boxes[i].shape.getGlobalBounds().contains(transMousePos)) //&& !(boxes[i].wasClicked))
                         {
                             boxes[i].wasClicked = true;
+
                             if(isNotCross)
                             {
                                 crosses.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY);
@@ -151,6 +212,7 @@ int main()
                                 isNotCross = true;
                                 boxes[i].isCircled = true;
                             }
+                            checkForWin(i,boxes);
                         }
                 }
         }
