@@ -49,7 +49,6 @@
 			<Add library="sfml-system" />
 			<Add directory="/home/heslo-odin/Documents/SFML_Attempt_2/SFML-3.0.0/lib" />
 		</Linker>
-		<Unit filename="fonts/PLANK___.TTF" />
 		<Unit filename="main.cpp" />
 		<Unit filename="sprites/kriz50.png" />
 		<Unit filename="sprites/kruh50.png" />

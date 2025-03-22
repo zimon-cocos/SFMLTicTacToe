@@ -5,14 +5,15 @@
 
 constexpr unsigned int wWidth {800};
 constexpr unsigned int wHeight {800};
-constexpr float boxWidth {60.0f};
+constexpr float boxWidth {30.0f};
 constexpr float boxDiagonal {boxWidth * sqrt(2)};
-constexpr int boxAmountX {6};
-constexpr int boxAmountY {6};
+constexpr int boxAmountX {12};
+constexpr int boxAmountY {12};
 constexpr float outlineThickness{4.0f};
 constexpr float tempCircleRadius{boxWidth/3};
 bool isNotCross {true};
 constexpr float objectsSize {boxWidth/10};
+constexpr int toWin {5};
 
 
 
@@ -55,6 +56,12 @@ struct Cross
     }
 };
 
+    enum boxState
+        {
+            notClicked,
+            Crossed,
+            Circled,
+        };
 
 
 
@@ -68,6 +75,8 @@ struct Box
     float centerPosX {0};
     float centerPosY {0};
 
+
+    boxState state {notClicked};
     bool wasClicked {false};
     bool isCrossed {false};
     bool isCircled {false};
@@ -88,27 +97,122 @@ struct Box
 
 };
 
+int negativeIndexPrevention(int n)
+{
+    while(n<0)
+    {
+        ++n;
+    }
+    return n;
+}
 
-void checkForWin(unsigned int index2Check, std::vector<Box>& vct2Check)
+unsigned int conStatesX {0};
+unsigned int conStatesY {0};
+void checkForWin(int index2Check, std::vector<Box>& vct2Check, boxState toCheck4)
 {
     std::cout<< "[" << vct2Check[index2Check].gridXValue << "," << vct2Check[index2Check].gridYValue << "] is crossed: " << vct2Check[index2Check].isCrossed << ",is circled:" << vct2Check[index2Check].isCircled << '\n';
-    //Check x axis, win type of middle placement
-    if((vct2Check[index2Check-1].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2Check+1].gridYValue == vct2Check[index2Check].gridYValue))
-       {
-           if(vct2Check[index2Check-1].isCrossed && vct2Check[index2Check].isCrossed && vct2Check[index2Check+1].isCrossed)
-            {
-             std::cout << "Cross wins.\n";
-            }
-       }
 
-    //Check y axis, win type of middle placement
-    if((vct2Check[index2Check-boxAmountY].gridXValue == vct2Check[index2Check].gridXValue) && (vct2Check[index2Check+boxAmountY].gridXValue == vct2Check[index2Check].gridXValue))
-       {
-           if(vct2Check[index2Check-boxAmountY].isCrossed && vct2Check[index2Check].isCrossed && vct2Check[index2Check+boxAmountY].isCrossed)
+    // check x axis WIP
+
+    //stredovy win
+    for(int index2CheckInLoop {index2Check - (toWin/2)}; index2CheckInLoop <= (index2Check + (toWin/2)); ++index2CheckInLoop)
+        {
+           //prevent negative index
+            while(index2CheckInLoop<0)
             {
-             std::cout << "Cross wins.\n";
+                ++index2CheckInLoop;
             }
-       }
+
+            if((vct2Check[index2CheckInLoop].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state))
+            {
+                std::cout << "Index to check je: " << index2CheckInLoop << '\n';
+                vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
+                ++conStatesX;
+            }
+        }
+    //pravobocny win
+    for(int index2CheckInLoop {index2Check - toWin + 1}; index2CheckInLoop <= index2Check; ++index2CheckInLoop)
+
+            while(index2CheckInLoop<0)
+            {
+                ++index2CheckInLoop;
+            }
+
+            if((vct2Check[index2CheckInLoop].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state))
+            {
+                std::cout << "Index to check je: " << index2CheckInLoop << '\n';
+                vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
+                ++conStatesX;
+            }
+
+
+    //check y axis WIP
+    for(int index2CheckInLoop {index2Check - ((toWin/2)*boxAmountX)}; index2CheckInLoop <= (index2Check + ((toWin/2))*boxAmountX); index2CheckInLoop = index2CheckInLoop+boxAmountX)
+        {
+           //prevent negative index
+            while(index2CheckInLoop<0)
+            {
+                index2CheckInLoop = index2CheckInLoop+boxAmountX;
+            }
+
+            if((vct2Check[index2CheckInLoop].gridXValue == vct2Check[index2Check].gridXValue) && (vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state))
+            {
+                std::cout << "Index to check je: " << index2CheckInLoop << '\n';
+                vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
+                ++conStatesY;
+            }
+        }
+    if((conStatesX == toWin) || (conStatesY == toWin))
+    {
+        std::cout << "conStatesX" << conStatesX << '\n';
+        std::cout << "conStatesY" << conStatesY << '\n';
+        std::cout << "Win detected\n";
+    }
+    else
+    {
+        conStatesX = 0;
+        conStatesY = 0;
+    }
+    /*//Check x axis, win type of middle placement
+    if(toCheck4 == boxState::Crossed)
+    {
+        if((vct2Check[index2Check-1].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2Check+1].gridYValue == vct2Check[index2Check].gridYValue))
+           {
+               if(vct2Check[index2Check-1].state == Crossed && vct2Check[index2Check].state == Crossed && vct2Check[index2Check+1].state == Crossed)
+                {
+                 std::cout << "Cross wins.\n";
+                }
+           }
+
+        //Check y axis, win type of middle placement
+        if((vct2Check[index2Check-boxAmountY].gridXValue == vct2Check[index2Check].gridXValue) && (vct2Check[index2Check+boxAmountY].gridXValue == vct2Check[index2Check].gridXValue))
+           {
+               if(vct2Check[index2Check-boxAmountY].state == Circled && vct2Check[index2Check].state == Circled && vct2Check[index2Check+boxAmountY].state == Circled)
+                {
+                 std::cout << "Cross wins.\n";
+                }
+           }
+    }
+    else
+    {
+        if((vct2Check[index2Check-1].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2Check+1].gridYValue == vct2Check[index2Check].gridYValue))
+           {
+               if(vct2Check[index2Check-1].state == Circled && vct2Check[index2Check].state == Circled && vct2Check[index2Check+1].state == Circled)
+                {
+                 std::cout << "Circle wins.\n";
+                }
+           }
+
+        //Check y axis, win type of middle placement
+        if((vct2Check[index2Check-boxAmountY].gridXValue == vct2Check[index2Check].gridXValue) && (vct2Check[index2Check+boxAmountY].gridXValue == vct2Check[index2Check].gridXValue))
+           {
+               if(vct2Check[index2Check-boxAmountY].state == Circled && vct2Check[index2Check].state == Circled && vct2Check[index2Check+boxAmountY].state == Circled)
+                {
+                 std::cout << "Circle wins.\n";
+                }
+           }
+    }*/
+
 
 
 }
@@ -147,7 +251,7 @@ int main()
     int boxesX {0};
     int boxesY {0};
 
-    for(int i {0}; i<boxes.size(); ++i)
+    for(long unsigned int i {0}; i<boxes.size(); ++i)
         {
             if(boxesX < boxAmountX)
             {
@@ -190,29 +294,31 @@ int main()
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
     {
-        if(timeElapsed.asSeconds() > 0.2)
+        if(timeElapsed.asSeconds() > 0.2);
         {
             clock.restart();
             auto mousePos = sf::Mouse::getPosition(window);
             auto transMousePos = window.mapPixelToCoords(mousePos);
             for(unsigned int i {0};i<boxes.size();++i)
                 {
-                    if(boxes[i].shape.getGlobalBounds().contains(transMousePos)) //&& !(boxes[i].wasClicked))
+                    if(boxes[i].shape.getGlobalBounds().contains(transMousePos) && (boxes[i].state == boxState::notClicked))
                         {
-                            boxes[i].wasClicked = true;
-
+                            //boxes[i].wasClicked = true;
+                            std::cout << "Klikol si na: " << i << '\n';
                             if(isNotCross)
                             {
                                 crosses.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY);
                                 isNotCross = false;
-                                boxes[i].isCrossed = true;
+                                boxes[i].state = boxState::Crossed;
+                                checkForWin(i,boxes,boxState::Crossed);
                             }
                             else{
                                 circles.emplace_back(boxes[i].centerPosX,boxes[i].centerPosY,sf::Color::Blue);
                                 isNotCross = true;
-                                boxes[i].isCircled = true;
+                                boxes[i].state = boxState::Circled;
+                                checkForWin(i,boxes,boxState::Circled);
                             }
-                            checkForWin(i,boxes);
+
                         }
                 }
         }
