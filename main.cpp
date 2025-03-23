@@ -7,13 +7,13 @@ constexpr unsigned int wWidth {800};
 constexpr unsigned int wHeight {800};
 constexpr float boxWidth {30.0f};
 constexpr float boxDiagonal {boxWidth * sqrt(2)};
-constexpr int boxAmountX {12};
-constexpr int boxAmountY {12};
+constexpr int boxAmountX {6};
+constexpr int boxAmountY {6};
 constexpr float outlineThickness{4.0f};
 constexpr float tempCircleRadius{boxWidth/3};
 bool isNotCross {true};
 constexpr float objectsSize {boxWidth/10};
-constexpr int toWin {5};
+constexpr int toWin {3};
 
 
 
@@ -120,101 +120,82 @@ void checkForWin(int index2Check, std::vector<Box>& vct2Check, boxState toCheck4
            //prevent negative index
             while(index2CheckInLoop<0)
             {
+                std::cout << "Zaporny index prevencia";
                 ++index2CheckInLoop;
             }
-
+            std::cout << "(stredovy win X) Skontrolovany index je: " << index2CheckInLoop << '\n';
             if((vct2Check[index2CheckInLoop].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state))
             {
-                std::cout << "Index to check je: " << index2CheckInLoop << '\n';
+                std::cout << "(stredovy win X) Index ktory dava constate+: " << index2CheckInLoop << '\n';
                 vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
                 ++conStatesX;
             }
         }
-    //pravobocny win
+        if((conStatesX >= toWin) || (conStatesY >= toWin))
+        {
+            std::cout << "***WIN detected***\n";
+        }
+        conStatesX = 0;
+    //win ked das na pravy okraj postupnosti, toto mi riadne dosere algoritmus, bez tohto ale stredove winy idu dobre
+    //funguje to ok len ked je constatesx = toWin tak to nezarata win?? - 9:45 :D 9:48 - sike
     for(int index2CheckInLoop {index2Check - toWin + 1}; index2CheckInLoop <= index2Check; ++index2CheckInLoop)
-
-            while(index2CheckInLoop<0)
             {
-                ++index2CheckInLoop;
-            }
+                while(index2CheckInLoop<0)
+                {
 
-            if((vct2Check[index2CheckInLoop].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state))
-            {
-                std::cout << "Index to check je: " << index2CheckInLoop << '\n';
-                vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
-                ++conStatesX;
+                    std::cout << "Zaporny index prevencia";
+                    ++index2CheckInLoop;
+                }
+
+                std::cout << "(pravy bok win X) Skontrolovany index: " << index2CheckInLoop << '\n';
+                if((vct2Check[index2CheckInLoop].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state))
+                {
+                    std::cout << "(pravy bok win X) Index ktory dava constate+: " << index2CheckInLoop << '\n';
+                    vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
+                    ++conStatesX;
+                }
+
             }
 
 
     //check y axis WIP
+
+    //stredovy win
     for(int index2CheckInLoop {index2Check - ((toWin/2)*boxAmountX)}; index2CheckInLoop <= (index2Check + ((toWin/2))*boxAmountX); index2CheckInLoop = index2CheckInLoop+boxAmountX)
         {
            //prevent negative index
             while(index2CheckInLoop<0)
             {
+                std::cout << "Zaporny index prevencia";
                 index2CheckInLoop = index2CheckInLoop+boxAmountX;
             }
-
+            std::cout << "(stredovy win Y) Skontrolovany index: " << index2CheckInLoop << '\n';
             if((vct2Check[index2CheckInLoop].gridXValue == vct2Check[index2Check].gridXValue) && (vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state))
             {
-                std::cout << "Index to check je: " << index2CheckInLoop << '\n';
+                std::cout << "(stredovy win Y) Index ktory dava constate+: " << index2CheckInLoop << '\n';
                 vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
                 ++conStatesY;
             }
         }
-    if((conStatesX == toWin) || (conStatesY == toWin))
+    std::cout << "End of win checking.\n";
+
+    if((conStatesX >= toWin) || (conStatesY >= toWin))
     {
         std::cout << "conStatesX" << conStatesX << '\n';
         std::cout << "conStatesY" << conStatesY << '\n';
-        std::cout << "Win detected\n";
-    }
-    else
-    {
+        std::cout << "***WIN detected***\n";
         conStatesX = 0;
         conStatesY = 0;
     }
-    /*//Check x axis, win type of middle placement
-    if(toCheck4 == boxState::Crossed)
-    {
-        if((vct2Check[index2Check-1].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2Check+1].gridYValue == vct2Check[index2Check].gridYValue))
-           {
-               if(vct2Check[index2Check-1].state == Crossed && vct2Check[index2Check].state == Crossed && vct2Check[index2Check+1].state == Crossed)
-                {
-                 std::cout << "Cross wins.\n";
-                }
-           }
-
-        //Check y axis, win type of middle placement
-        if((vct2Check[index2Check-boxAmountY].gridXValue == vct2Check[index2Check].gridXValue) && (vct2Check[index2Check+boxAmountY].gridXValue == vct2Check[index2Check].gridXValue))
-           {
-               if(vct2Check[index2Check-boxAmountY].state == Circled && vct2Check[index2Check].state == Circled && vct2Check[index2Check+boxAmountY].state == Circled)
-                {
-                 std::cout << "Cross wins.\n";
-                }
-           }
-    }
     else
     {
-        if((vct2Check[index2Check-1].gridYValue == vct2Check[index2Check].gridYValue) && (vct2Check[index2Check+1].gridYValue == vct2Check[index2Check].gridYValue))
-           {
-               if(vct2Check[index2Check-1].state == Circled && vct2Check[index2Check].state == Circled && vct2Check[index2Check+1].state == Circled)
-                {
-                 std::cout << "Circle wins.\n";
-                }
-           }
+        std::cout << "conStatesX" << conStatesX << '\n';
+        std::cout << "conStatesY" << conStatesY << '\n';
+        std::cout << "Constates RESET\n";
+        conStatesX = 0;
+        conStatesY = 0;
 
-        //Check y axis, win type of middle placement
-        if((vct2Check[index2Check-boxAmountY].gridXValue == vct2Check[index2Check].gridXValue) && (vct2Check[index2Check+boxAmountY].gridXValue == vct2Check[index2Check].gridXValue))
-           {
-               if(vct2Check[index2Check-boxAmountY].state == Circled && vct2Check[index2Check].state == Circled && vct2Check[index2Check+boxAmountY].state == Circled)
-                {
-                 std::cout << "Circle wins.\n";
-                }
-           }
-    }*/
-
-
-
+    }
 }
 
 
