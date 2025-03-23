@@ -7,13 +7,13 @@ constexpr unsigned int wWidth {800};
 constexpr unsigned int wHeight {800};
 constexpr float boxWidth {30.0f};
 constexpr float boxDiagonal {boxWidth * sqrt(2)};
-constexpr int boxAmountX {10};
-constexpr int boxAmountY {10};
+constexpr int boxAmountX {6};
+constexpr int boxAmountY {6};
 constexpr float outlineThickness{4.0f};
 constexpr float tempCircleRadius{boxWidth/3};
 bool isNotCross {true};
 constexpr float objectsSize {boxWidth/10};
-constexpr int toWin {3};
+constexpr int toWin {5};
 
 
 
@@ -312,8 +312,61 @@ void checkForWin(int index2Check, std::vector<Box>& vct2Check, boxState toCheck4
     }
     conStatesXY = 0;
 
-    std::cout << "End of win checking.\n";
+    //win ked das na lavy horny okraj  diagonalnej postupnosti, toto mi mozno riadne dosere algoritmus, bez tohto ale stredove winy idu dobre
+    for(int index2CheckInLoop {index2Check + ((boxAmountX)+1)*(toWin-1)}; index2CheckInLoop >= index2Check; index2CheckInLoop = index2CheckInLoop - (boxAmountX+1))
+        {
+            while(index2CheckInLoop<0)
+            {
 
+                std::cout << "Zaporny index prevencia";
+                ++index2CheckInLoop;
+            }
+
+            std::cout << "(lavy horny bok win XY) Skontrolovany index: " << index2CheckInLoop << '\n';
+            if(/*vct2Check[index2CheckInLoop].gridXValue == vct2Check[index2Check].gridXValue) && */ vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state)
+            {
+                std::cout << "(lavy horny bok win XY) Index ktory dava constate+: " << index2CheckInLoop << '\n';
+                vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
+                ++conStatesXY;
+                std::cout << conStatesXY << '\n';
+            }
+        }
+    if((conStatesX >= toWin) || (conStatesY >= toWin) || (conStatesXY >= toWin))
+    {
+        std::cout << "***WIN detected HORNY LAVY XY***\n";
+    }
+    conStatesXY = 0;
+
+    //win ked das na pravy dolny okraj  diagonalnej postupnosti, toto mi mozno riadne dosere algoritmus, bez tohto ale stredove winy idu dobre
+    for(int index2CheckInLoop {index2Check - ((boxAmountX)+1)*(toWin-1)}; index2CheckInLoop <= index2Check; index2CheckInLoop = index2CheckInLoop + (boxAmountX+1))
+        {
+            while(index2CheckInLoop<0)
+            {
+
+                std::cout << "Zaporny index prevencia";
+                ++index2CheckInLoop;
+            }
+
+            std::cout << "(pravy dolny bok win XY) Skontrolovany index: " << index2CheckInLoop << '\n';
+            if(/*vct2Check[index2CheckInLoop].gridXValue == vct2Check[index2Check].gridXValue) && */ vct2Check[index2CheckInLoop].state == vct2Check[index2Check].state)
+            {
+                std::cout << "(pravy dolny bok win XY) Index ktory dava constate+: " << index2CheckInLoop << '\n';
+                vct2Check[index2CheckInLoop].shape.setFillColor(sf::Color::Green);
+                ++conStatesXY;
+                std::cout << conStatesXY << '\n';
+            }
+        }
+    if((conStatesX >= toWin) || (conStatesY >= toWin) || (conStatesXY >= toWin))
+    {
+        std::cout << "***WIN detected DOLNY PRAVY XY***\n";
+    }
+    conStatesXY = 0;
+
+
+
+
+
+    std::cout << "End of win checking.\n";
     if((conStatesX >= toWin) || (conStatesY >= toWin))
     {
         std::cout << "conStatesX" << conStatesX << '\n';
